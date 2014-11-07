@@ -1,11 +1,17 @@
 package com.rodrigueztomas.todolistexample;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
@@ -14,7 +20,8 @@ public class MainActivity extends Activity {
 
     private ListView listView;
     private ArrayList<String> objects;
-    private ArrayAdapter<String> adapter;
+    //private ArrayAdapter<String> adapter;
+    private CustomAdapter adapter;
 
 
     @Override
@@ -27,7 +34,7 @@ public class MainActivity extends Activity {
         objects = new ArrayList<String>();
         objects.add("Test 1");
 
-        adapter = new ArrayAdapter<String>(this, R.layout.simple_list_item, objects);
+        adapter = new CustomAdapter(this, R.layout.list_item, objects);
 
         listView.setAdapter(adapter);
 
@@ -55,4 +62,54 @@ public class MainActivity extends Activity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+
+    public class CustomAdapter extends ArrayAdapter<String>{
+        Context context;
+        int resourceId;
+        ArrayList<String> items;
+
+        public CustomAdapter(Context context, int resourceId, ArrayList<String> items)
+        {
+            super(context, resourceId, items);
+            this.context = context;
+            this.resourceId = resourceId;
+            this.items = items;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent)
+        {
+            View v = convertView;
+
+            if ( v == null )
+            {
+                LayoutInflater vi = getLayoutInflater();
+                v = vi.inflate(resourceId, null);
+            }
+
+            String str = objects.get(position);
+
+            TextView title = (TextView) v.findViewById(R.id.title);
+            ImageButton button = (ImageButton) v.findViewById(R.id.button);
+
+            button.setTag(position);
+
+            button.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    int pos = (Integer)v.getTag();
+                    objects.remove(pos);
+                    adapter.notifyDataSetChanged();
+                }
+            });
+
+            title.setText(str);
+
+            return v;
+        }
+    }
+
+
+
 }
